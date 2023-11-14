@@ -5,6 +5,7 @@ defmodule KnDiscord.Schemas.Problems do
   @primary_key {:id, :integer, autogenerate: false}
   schema "problems" do
     field(:name, :string)
+    field(:test_name, :string)
     field(:default_points, :integer)
     field(:visible, :boolean)
     field(:visible_tests, :boolean)
@@ -16,6 +17,7 @@ defmodule KnDiscord.Schemas.Problems do
     field(:score_precision, :integer)
     field(:published_at, :utc_datetime)
     field(:scoring_strategy, :string)
+    field(:created_at, :utc_datetime)
   end
 
   def changeset(problem, attrs) do
@@ -23,6 +25,7 @@ defmodule KnDiscord.Schemas.Problems do
     |> cast(attrs, [
       :id,
       :name,
+      :test_name,
       :default_points,
       :visible,
       :visible_tests,
@@ -32,9 +35,10 @@ defmodule KnDiscord.Schemas.Problems do
       :source_credits,
       :console_input,
       :score_precision,
+      :scoring_strategy,
       :published_at,
-      :scoring_strategy
+      :created_at
     ])
-    |> validate_required([:id, :name, :default_points, :time_ms, :memory_limit])
+    |> validate_required([:id, :name, :created_at])
   end
 end

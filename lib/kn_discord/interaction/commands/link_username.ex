@@ -1,8 +1,9 @@
 defmodule KnDiscord.Interaction.Commands.LinkUsername do
-  use Nostrum
+  alias Nostrum.Api
+  alias Nostrum.Struct.Interaction
   alias KnDiscord.Schemas
   alias KnDiscord.Repo
-  alias Ecto.Query
+  import Ecto.Query
   require Logger
 
   @command_definition %{
@@ -21,7 +22,7 @@ defmodule KnDiscord.Interaction.Commands.LinkUsername do
   def command_definition, do: @command_definition
 
   def handle(
-        %Nostrum.Struct.Interaction{
+        %Interaction{
           id: id,
           data: %{options: [%{value: username}]},
           token: token,
@@ -55,12 +56,13 @@ defmodule KnDiscord.Interaction.Commands.LinkUsername do
   end
 
   defp check_for_submission(username, problem_id, interaction, discord_id) do
-    user = Repo.get_by(Users, name: username)
+    user = Repo.get_by(Schemas.Users, name: username)
 
     if user do
       submission =
         Repo.one(
-          from(s in Submissions,
+          from(s in Schemas.Submissions,
+            # Use ^ to pin external variables
             where: s.user_id == ^user.id and s.problem_id == ^problem_id,
             limit: 1
           )
@@ -81,12 +83,12 @@ defmodule KnDiscord.Interaction.Commands.LinkUsername do
   end
 
   defp link_accounts(user, discord_id) do
-    changeset = Users.changeset(user, %{discord_id: discord_id})
+    changeset = Schemas.Users.changeset(user, %{discord_id: discord_id})
     Repo.update(changeset)
   end
 
   defp send_discord_response(interaction, message) do
-    Nostrum.Api.create_followup_message(interaction.token, %{
+    Api.create_followup_message(interaction.token, %{
       content: message
     })
   end

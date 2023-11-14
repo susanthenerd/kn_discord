@@ -4,8 +4,9 @@ defmodule KnDiscord.Interaction.Register do
   require Logger
 
   @command_modules [
-    KnDiscord.Interaction.Commands.Ping
-    # Add other command modules here
+    KnDiscord.Interaction.Commands.Ping,
+    KnDiscord.Interaction.Commands.SetOffset,
+    KnDiscord.Interaction.Commands.LinkUsername
   ]
 
   def start(_type, _args) do

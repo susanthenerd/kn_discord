@@ -5,7 +5,7 @@ defmodule KnDiscord.Consumer do
   alias Nostrum.Api
 
   def handle_event({:READY, _event, _ws_state}) do
-    KnDiscord.Interaction.Register.register_commands_test_on_start()
+    # KnDiscord.Interaction.Register.register_commands_test_on_start()
   end
 
   def handle_event({:MESSAGE_CREATE, msg, _ws_state}) do

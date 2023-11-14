@@ -11,6 +11,10 @@ defmodule KnDiscord.Interaction.Handler do
     Commands.SetOffset.handle(interaction)
   end
 
+  def dispatch_command(%Interaction{data: %{:name => "linkusername"} = _data} = interaction) do
+    Commands.LinkUsername.handle(interaction)
+  end
+
   def dispatch_command(%Interaction{} = interaction) do
     Logger.error("Unexpected interaction: #{inspect(interaction)}")
   end

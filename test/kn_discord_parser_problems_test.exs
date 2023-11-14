@@ -1,4 +1,4 @@
-defmodule KnDiscord.Parser.ProblemsTest do
+defmodule KnDiscordParserProblemsTest do
   use ExUnit.Case
   alias KnDiscord.Parser.Problems
   alias KnDiscord.Schemas.Problems

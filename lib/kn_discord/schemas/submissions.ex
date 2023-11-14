@@ -5,7 +5,7 @@ defmodule KnDiscord.Schemas.Submissions do
   @primary_key {:id, :integer, autogenerate: false}
   schema "submissions" do
     field(:created_at, :utc_datetime)
-    field(:score, :integer)
+    field(:score, :float)
     field(:compile_error, :boolean)
     field(:max_time_ms, :float)
     field(:max_memory_bytes, :integer)
@@ -40,13 +40,8 @@ defmodule KnDiscord.Schemas.Submissions do
     ])
     |> validate_required([
       :id,
-      :created_at,
       :user_id,
-      :problem_id,
-      :score,
-      :compile_error,
-      :max_time_ms,
-      :max_memory_bytes
+      :problem_id
     ])
   end
 end

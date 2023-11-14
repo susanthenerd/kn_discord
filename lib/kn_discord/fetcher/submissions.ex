@@ -1,9 +1,11 @@
 defmodule KnDiscord.Fetcher.Submissions do
   use GenServer
   require Logger
-  alias KnDiscord.Parser
-  alias KnDiscord.Schemas
+  import Ecto.Query
+
+  alias KnDiscord.Parser.MultiParser
   alias KnDiscord.Repo
+  alias KnDiscord.Schemas
 
   @interval 60_000
   @api_url "https://kilonova.ro/api/submissions/get"
@@ -22,77 +24,72 @@ defmodule KnDiscord.Fetcher.Submissions do
   end
 
   defp get_last_state() do
-    case fetch_data(0) do
-      {:ok, data} ->
-        total_submissions = data["data"]["count"]
-        div(total_submissions, @limit) * @limit
-
-      {:error, _reason} ->
-        schedule_retry()
-        # Default offset in case of an error, returned after scheduling a retry
+    try do
+      count_query = from(s in Schemas.Submissions, select: count())
+      total_submissions = Repo.one!(count_query)
+      div(total_submissions, @limit) * @limit
+    rescue
+      e in [Ecto.QueryError, Postgrex.Error] ->
+        Logger.error("Error fetching submission count: #{inspect(e)}")
         0
     end
-  end
-
-  defp schedule_retry() do
-    Process.send_after(self(), :retry_get_last_state, @error_delay)
-  end
-
-  def handle_cast({:change_offset, new_offset}, state) do
-    new_state = %{state | last_offset: new_offset}
-    {:noreply, fetch_and_schedule(new_state)}
-  end
-
-  defp doParsing(data) do
-    Parser.Users.parse_users(data["users"])
-    |> Enum.map(fn attrs ->
-      attrs_map = Map.from_struct(attrs)
-      Logger.debug(inspect(attrs_map))
-
-      Schemas.Users.changeset(%Schemas.Users{}, attrs_map)
-      |> Repo.insert(on_conflict: :nothing, conflict_target: :id)
-    end)
-
-    Logger.debug(inspect(data["problems"]))
-
-    Parser.Problems.parse_problems(data["problems"])
-    |> Enum.map(fn attrs ->
-      attrs_map = Map.from_struct(attrs)
-
-      Schemas.Problems.changeset(%Schemas.Problems{}, attrs_map)
-      |> Repo.insert(on_conflict: :nothing, conflict_target: :id)
-    end)
-
-    Parser.Submissions.parse_submissions(data["submissions"])
-    |> Enum.map(fn attrs ->
-      attrs_map = Map.from_struct(attrs)
-      Logger.debug(inspect(attrs_map))
-
-      Schemas.Submissions.changeset(%Schemas.Submissions{}, attrs_map)
-      |> Repo.insert(on_conflict: :nothing, conflict_target: :id)
-    end)
   end
 
   defp fetch_and_schedule(state) do
     case fetch_data(state.last_offset) do
       {:ok, data} ->
-        new_offset = state.last_offset + @limit
-        new_state = %{state | last_offset: new_offset}
-        doParsing(data["data"])
+        MultiParser.doParsing(data["data"])
+        submissions_length = length(data["data"]["submissions"])
 
-        if length(data["data"]["count"]) == @limit do
-          GenServer.cast(self(), :continue_fetching)
-        else
-          Process.send_after(self(), :fetch, @interval)
-        end
+        new_offset = calculate_new_offset(submissions_length, state.last_offset)
 
-        new_state
+        determine_action(submissions_length)
+        |> perform_action()
+
+        %{state | last_offset: new_offset}
 
       {:error, reason} ->
         Logger.error("Failed to fetch data: #{reason}")
         schedule_fetch_retry()
         state
     end
+  end
+
+  defp calculate_new_offset(submissions_length, last_offset) do
+    if submissions_length == @limit, do: last_offset + @limit, else: last_offset
+  end
+
+  defp determine_action(submissions_length) do
+    if submissions_length == @limit, do: :continue_fetching, else: :fetch
+  end
+
+  defp perform_action(:continue_fetching) do
+    GenServer.cast(self(), :continue_fetching)
+  end
+
+  defp perform_action(:fetch) do
+    Process.send_after(self(), :fetch, @interval)
+  end
+
+  def handle_cast({:change_offset, new_offset}, state) do
+    Logger.debug("Offset is set now to #{new_offset}")
+    new_state = fetch_and_schedule(%{state | last_offset: new_offset})
+    {:noreply, new_state}
+  end
+
+  def handle_cast(:continue_fetching, state) do
+    new_state = fetch_and_schedule(state)
+    {:noreply, new_state}
+  end
+
+  def handle_info(:retry_fetch, state) do
+    new_state = fetch_and_schedule(state)
+    {:noreply, new_state}
+  end
+
+  def handle_info(:fetch, state) do
+    new_state = fetch_and_schedule(state)
+    {:noreply, new_state}
   end
 
   defp schedule_fetch_retry() do
@@ -109,18 +106,6 @@ defmodule KnDiscord.Fetcher.Submissions do
       {:error, %HTTPoison.Error{reason: reason}} ->
         {:error, reason}
     end
-  end
-
-  def handle_info(:retry_fetch, state) do
-    fetch_and_schedule(state)
-  end
-
-  def handle_info(:fetch, state) do
-    fetch_and_schedule(state)
-  end
-
-  def handle_info(:continue_fetching, state) do
-    fetch_and_schedule(state)
   end
 
   def change_offset(new_offset) do

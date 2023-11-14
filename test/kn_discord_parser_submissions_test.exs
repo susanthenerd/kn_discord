@@ -1,4 +1,4 @@
-defmodule KnDiscord.Parser.SubmissionsTest do
+defmodule KnDiscordParserSubmissionsTest do
   use ExUnit.Case
   alias KnDiscord.Parser.Submissions
   alias KnDiscord.Schemas.Submission

@@ -49,6 +49,35 @@
       <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/parse_trans" />
       <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/ssl_verify_fun" />
       <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/unicode_util_compat" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/test/lib/castle" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/test/lib/certifi" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/test/lib/chacha20" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/test/lib/cowlib" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/test/lib/curve25519" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/test/lib/db_connection" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/test/lib/decimal" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/test/lib/ecto" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/test/lib/ecto_sql" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/test/lib/ed25519" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/test/lib/equivalex" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/test/lib/forecastle" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/test/lib/gun" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/test/lib/hackney" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/test/lib/httpoison" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/test/lib/idna" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/test/lib/jason" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/test/lib/kcl" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/test/lib/metrics" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/test/lib/mime" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/test/lib/mimerl" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/test/lib/nostrum" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/test/lib/parse_trans" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/test/lib/poly1305" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/test/lib/postgrex" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/test/lib/salsa20" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/test/lib/ssl_verify_fun" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/test/lib/telemetry" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/test/lib/unicode_util_compat" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
